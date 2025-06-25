@@ -12,6 +12,7 @@ entities in the codebase, then uses a combination of LLM, and LLM-as-a-judge to 
 the documentation.
 You should pretify your code before and after running this script to normalize the formatting.
 `,
+  cache: true,
   accept: ".ts,.mts,.tsx,.mtsx,.cts,.py,*.cs",
   files: "**/*.{ts,mts,tsx,mtsx,cts,py,cs}",
   branding: {
