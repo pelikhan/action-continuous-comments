@@ -38,7 +38,7 @@ You must set "Allow GitHub Actions to create and approve pull requests" in your 
 Add the following to your step in your workflow file:
 
 ```yaml
-uses: pelikhan/action-genai-commentor@v0
+uses: pelikhan/action-continous-comments@v0
 with:
   github_token: ${{ secrets.GITHUB_TOKEN }}
   files: "**/src/**/*.{ts,tsx,mts,cts,py}"
@@ -78,7 +78,7 @@ jobs:
 
       # Improve the comments in the codebase
       - name: improve comments
-        uses: pelikhan/action-genai-commentor@v0
+        uses: pelikhan/action-continous-comments@v0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           max_edits: 20
