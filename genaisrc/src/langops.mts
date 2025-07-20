@@ -9,7 +9,7 @@ export interface LanguageOps {
   getCommentableNodesMatcher: (
     entityKinds: EntityKind[],
     withComments: boolean,
-    exportsOnly: boolean
+    exportsOnly: boolean,
   ) => SgRule;
 
   /** Given a commentable node which already has a doc comment, find the range of comment nodes */
@@ -26,13 +26,13 @@ export interface LanguageOps {
   addUpdateDocPrompt: (
     _: ChatGenerationContext,
     declKind: any,
-    declRef: string
+    declRef: string,
   ) => PromptTemplateString;
 
   addGenerateDocPrompt: (
     _: ChatGenerationContext,
     declKind: string,
     declRef: string,
-    fileRef: string
+    fileRef: string,
   ) => PromptTemplateString;
 }

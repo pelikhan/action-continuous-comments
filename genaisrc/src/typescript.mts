@@ -6,7 +6,7 @@ class Typescript implements LanguageOps {
   getCommentableNodesMatcher(
     entityKinds: EntityKind[],
     withComments: boolean,
-    exportsOnly: boolean
+    exportsOnly: boolean,
   ) {
     const declKindsRaw: SgRule = {
       any: [
@@ -88,7 +88,7 @@ class Typescript implements LanguageOps {
     _: ChatGenerationContext,
     declKind: any,
     declRef: string,
-    fileRef: string
+    fileRef: string,
   ): PromptTemplateString {
     return _.$`Generate a TypeScript documentation comment for the ${declKind} ${declRef}.
 - Make sure parameters, type parameters, and return types are documented if relevant.
@@ -102,7 +102,7 @@ The full source of the file is in ${fileRef} for reference.`;
   addUpdateDocPrompt(
     _: ChatGenerationContext,
     declKind: any,
-    declRef: string
+    declRef: string,
   ): PromptTemplateString {
     return _.$`Update the TypeScript docstring <DOCSTRING> to match the code in ${declKind} ${declRef}.
 - If the docstring is up to date, return /NO/. It's ok to leave it as is.

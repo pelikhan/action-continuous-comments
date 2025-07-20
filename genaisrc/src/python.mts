@@ -101,7 +101,7 @@ description
     _: ChatGenerationContext,
     declKind: string,
     declRef: string,
-    fileRef: string
+    fileRef: string,
   ) {
     return _.$`Generate a Python documentation comment for the ${declKind} ${declRef}.
 - Make sure parameters, type parameters, and return types are documented if relevant.
