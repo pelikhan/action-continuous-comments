@@ -1,3 +1,4 @@
+import { type SgNode, type SgRule } from "@genaiscript/plugin-ast-grep";
 import type { EntityKind, LanguageOps } from "./langops.mts";
 
 const dbg = host.logger("script:python");

@@ -1,3 +1,4 @@
+import { astGrep, type SgLang, type SgNode } from "@genaiscript/plugin-ast-grep";
 import { classify } from "./src/classify.mts";
 import { csharpOps } from "./src/csharp.mts";
 import type { EntityKind, LanguageOps } from "./src/langops.mts";
@@ -13,7 +14,7 @@ the documentation.
 You should pretify your code before and after running this script to normalize the formatting.
 `,
   cache: true,
-  accept: ".ts,.mts,.tsx,.mtsx,.cts,.py,*.cs",
+  accept: ".ts,.mts,.tsx,.mtsx,.cts,.py,.cs",
   files: "**/*.{ts,mts,tsx,mtsx,cts,py,cs}",
   branding: {
     color: "yellow",
@@ -120,7 +121,7 @@ const entityKinds: EntityKind[] = kinds
 dbg(`entityKinds: %o`, entityKinds);
 
 // launch ast-grep instance
-const sg = await host.astGrep();
+const sg = await astGrep();
 
 // collect tokens, generation stats for final report
 type FileStats = {

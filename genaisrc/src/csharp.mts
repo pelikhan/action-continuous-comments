@@ -1,3 +1,5 @@
+import { type SgNode, type SgRule } from "@genaiscript/plugin-ast-grep";
+
 const dbg = host.logger("script:csharp");
 
 import type { EntityKind, LanguageOps } from "./langops.mts";

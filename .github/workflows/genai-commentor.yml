@@ -31,7 +31,7 @@ jobs:
 
       # Improve the comments in the codebase
       - name: genai improve comments
-        uses: pelikhan/action-genai-commentor@main
+        uses: pelikhan/action-continous-comments@main
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           files: test/**/*.ts

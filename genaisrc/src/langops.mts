@@ -1,3 +1,4 @@
+import { type SgNode, type SgRule } from "@genaiscript/plugin-ast-grep";
 export type EntityKind =
   | "module"
   | "type"
@@ -31,7 +32,7 @@ export interface LanguageOps {
 
   addGenerateDocPrompt: (
     _: ChatGenerationContext,
-    declKind: string,
+    declKind: ReturnType<SgNode["kind"]>,
     declRef: string,
     fileRef: string
   ) => PromptTemplateString;

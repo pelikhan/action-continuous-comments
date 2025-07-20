@@ -1,5 +1,17 @@
-name: action-genai-commentor
-description: Generate code comments using AST insertion
+name: action-continuous-comments
+description: >
+  Generates and updates code comments using an AST/LLM hybrid approach.
+
+  It uses ast-grep to look for undocumented and documented functions, classes,
+  interfaces, and other
+
+  entities in the codebase, then uses a combination of LLM, and LLM-as-a-judge
+  to generate and validate
+
+  the documentation.
+
+  You should pretify your code before and after running this script to normalize
+  the formatting.
 inputs:
   model:
     description: The LLM model to use for generation.
@@ -31,6 +43,8 @@ inputs:
     description: >-
       The kinds of entities to target for documentation generation.
             This is a comma-separated list of entity types, e.g. "module,type,function,property,variable".
+            If not specified, all entities will be targeted.
+            Valid values: module,type,function,property,variable
     required: false
     default: module,type,function,property
   exports_only:
@@ -45,14 +59,55 @@ inputs:
     description: Files to process, separated by semi columns (;).
       .ts,.mts,.tsx,.mtsx,.cts,.py,.cs
     required: false
+  debug:
+    description: Enable debug logging
+      (https://microsoft.github.io/genaiscript/reference/scripts/logging/).
+    required: false
+  model_alias:
+    description: "A YAML-like list of model aliases and model id: `translation:
+      github:openai/gpt-4o`"
+    required: false
+  openai_api_key:
+    description: OpenAI API key
+    required: false
+  openai_api_base:
+    description: OpenAI API base URL
+    required: false
+  azure_openai_api_endpoint:
+    description: Azure OpenAI endpoint. In the Azure Portal, open your Azure OpenAI
+      resource, Keys and Endpoints, copy Endpoint.
+    required: false
+  azure_openai_api_key:
+    description: Azure OpenAI API key. **You do NOT need this if you are using
+      Microsoft Entra ID.
+    required: false
+  azure_openai_subscription_id:
+    description: Azure OpenAI subscription ID to list available deployments
+      (Microsoft Entra only).
+    required: false
+  azure_openai_api_version:
+    description: Azure OpenAI API version.
+    required: false
+  azure_openai_api_credentials:
+    description: Azure OpenAI API credentials type. Leave as 'default' unless you
+      have a special Azure setup.
+    required: false
+  azure_ai_inference_api_key:
+    description: Azure AI Inference key
+    required: false
+  azure_ai_inference_api_endpoint:
+    description: Azure Serverless OpenAI endpoint
+    required: false
+  azure_ai_inference_api_version:
+    description: Azure Serverless OpenAI API version
+    required: false
+  azure_ai_inference_api_credentials:
+    description: Azure Serverless OpenAI API credentials type
+    required: false
   github_token:
     description: "GitHub token with `models: read` permission at least
       (https://microsoft.github.io/genaiscript/reference/github-actions/#github\
       -models-permissions)."
-    required: true
-  debug:
-    description: Enable debug logging
-      (https://microsoft.github.io/genaiscript/reference/scripts/logging/).
     required: false
 outputs:
   text:
