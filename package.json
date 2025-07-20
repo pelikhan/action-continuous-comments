@@ -3,9 +3,8 @@
   "version": "0.0.2",
   "description": "A GitHub Action to generate TypeScript comments.",
   "dependencies": {
-    "@ast-grep/cli": "^0.38.7",
     "@ast-grep/lang-python": "^0.0.2",
-    "genaiscript": "^2.2.16"
+    "genaiscript": "1.142.15"
   },
   "scripts": {
     "upgrade": "npx -y npm-check-updates -u && npm install && npm run fix",
