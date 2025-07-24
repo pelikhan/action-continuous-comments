@@ -8,7 +8,7 @@ class C implements LanguageOps {
   getCommentableNodesMatcher(
     entityKinds: EntityKind[],
     withComments: boolean,
-    exportsOnly: boolean
+    exportsOnly: boolean,
   ) {
     const declKindsRaw: SgRule = {
       any: [
@@ -21,31 +21,33 @@ class C implements LanguageOps {
         entityKinds.includes("type") ? { kind: "struct_specifier" } : null,
         entityKinds.includes("type") ? { kind: "enum_specifier" } : null,
         // Global variables and declarations
-        entityKinds.includes("variable") ? { 
-          kind: "declaration",
-          // Only match top-level declarations (not local variables)
-          inside: { kind: "translation_unit" }
-        } : null,
+        entityKinds.includes("variable")
+          ? {
+              kind: "declaration",
+              // Only match top-level declarations (not local variables)
+              inside: { kind: "translation_unit" },
+            }
+          : null,
       ].filter(Boolean) as SgRule[],
     };
-    
+
     const declKinds: SgRule = {
       any: [declKindsRaw],
     };
-    
+
     const inside: SgRule = {
       inside: {
         kind: "translation_unit", // C files have translation_unit as root
       },
     };
-    
+
     const withDocComment: SgRule = {
       follows: {
         kind: "comment",
         stopBy: "neighbor",
       },
     };
-    
+
     const docsRule: SgRule = withComments
       ? withDocComment
       : {
@@ -73,7 +75,7 @@ class C implements LanguageOps {
   getLanguageSystemPromptName() {
     return "system.c";
   }
-  
+
   getCommentText(docs: string) {
     docs = parsers.unfence(docs, "*");
 
@@ -83,8 +85,11 @@ class C implements LanguageOps {
     }
 
     // Format as Doxygen-style comment
-    const lines = docs.split(/\r?\n/g).map(line => line.trim()).filter(line => line);
-    
+    const lines = docs
+      .split(/\r?\n/g)
+      .map((line) => line.trim())
+      .filter((line) => line);
+
     if (lines.length === 1) {
       // Single line comment - check if it needs @brief
       const line = lines[0];
@@ -99,7 +104,11 @@ class C implements LanguageOps {
         .map((line, index) => {
           if (index === 0 && !line.startsWith("@")) {
             return ` * @brief ${line}`;
-          } else if (line.startsWith("@param") || line.startsWith("@return") || line.startsWith("@")) {
+          } else if (
+            line.startsWith("@param") ||
+            line.startsWith("@return") ||
+            line.startsWith("@")
+          ) {
             return ` * ${line}`;
           } else if (line) {
             return ` * ${line}`;
@@ -111,12 +120,12 @@ class C implements LanguageOps {
       return `/**\n${formatted}\n */`;
     }
   }
-  
+
   addGenerateDocPrompt(
     _: ChatGenerationContext,
     declKind: any,
     declRef: string,
-    fileRef: string
+    fileRef: string,
   ) {
     return _.$`Generate a C documentation comment for the ${declKind} ${declRef}.
 - Make sure parameters and return types are documented if relevant.
