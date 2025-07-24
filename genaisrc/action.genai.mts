@@ -23,7 +23,8 @@ the documentation.
 You should pretify your code before and after running this script to normalize the formatting.
 `,
   cache: true,
-  accept: ".ts,.mts,.tsx,.mtsx,.cts,.py,.cs,.java,.h,.c,.rs,.cpp,.hpp,.cc,.cxx,.go",
+  accept:
+    ".ts,.mts,.tsx,.mtsx,.cts,.py,.cs,.java,.h,.c,.rs,.cpp,.hpp,.cc,.cxx,.go",
   files: "**/*.{ts,mts,tsx,mtsx,cts,py,cs,java,h,c,rs,cpp,hpp,cc,cxx,go}",
   branding: {
     color: "yellow",
@@ -535,7 +536,10 @@ function getLanguage(file: WorkspaceFile): SgLang {
         ? "java"
         : file.filename.endsWith(".c") || file.filename.endsWith(".h")
           ? "c"
-          : file.filename.endsWith(".cpp") || file.filename.endsWith(".hpp") || file.filename.endsWith(".cc") || file.filename.endsWith(".cxx")
+          : file.filename.endsWith(".cpp") ||
+              file.filename.endsWith(".hpp") ||
+              file.filename.endsWith(".cc") ||
+              file.filename.endsWith(".cxx")
             ? "cpp"
             : file.filename.endsWith(".rs")
               ? "rust"

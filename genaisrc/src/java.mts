@@ -4,7 +4,60 @@ const dbg = host.logger("script:java");
 
 import type { EntityKind, LanguageOps } from "./langops.mts";
 
+/**
+ * Implements LanguageOps for Java, providing methods to manage documentation comments
+ * and AST-related operations specific to Java code.
+ *
+ * @method getCommentableNodesMatcher
+ *   Returns a matcher object to find Java AST nodes eligible for documentation.
+ *   @param entityKinds Array of entity kinds to match (e.g., type, function, property).
+ *   @param withComments Whether to include only nodes with comments.
+ *   @param exportsOnly Whether to restrict to nodes with public modifier.
+ *   @return Matcher rule for use with AST-grep.
+ *
+ * @method getCommentNodes
+ *   Retrieves contiguous preceding comment nodes (block or line) for a given AST node.
+ *   @param node Java AST node to find comments for.
+ *   @return Array of comment nodes, or null if none.
+ *
+ * @method getCommentInsertionNode
+ *   Returns the node where a new comment should be inserted.
+ *   @param node AST node under consideration.
+ *   @return The insertion node.
+ *
+ * @method getLanguageSystemPromptName
+ *   Returns the identifier for the language/system prompt, if any.
+ *   @return The prompt name string.
+ *
+ * @method getCommentText
+ *   Formats a string as a Java Javadoc comment, converting raw input if necessary.
+ *   @param docs Raw documentation text.
+ *   @return Formatted Javadoc string.
+ *
+ * @method addGenerateDocPrompt
+ *   Prepares a prompt string for generating Javadoc for a declaration.
+ *   @param _ Prompt context.
+ *   @param declKind Declaration kind for documentation.
+ *   @param declRef Declaration reference/location.
+ *   @param fileRef Reference to the file containing the declaration.
+ *   @return Prompt string for documentation generation.
+ *
+ * @method addUpdateDocPrompt
+ *   Prepares a prompt for updating an existing Javadoc comment to reflect code changes.
+ *   @param _ Prompt context.
+ *   @param declKind Declaration kind.
+ *   @param declRef Declaration reference.
+ *   @return Prompt string for documentation update.
+ */
 class Java implements LanguageOps {
+  /**
+   * Constructs an AST matcher rule for Java nodes that can be documented.
+   *
+   * @param entityKinds Array of entity kinds (e.g., "type", "function", "property") to match.
+   * @param withComments If true, selects only nodes that are preceded by a comment; if false, selects nodes without a leading comment.
+   * @param exportsOnly If true, limits matches to nodes with the "public" modifier.
+   * @returns An AST matcher rule for selecting commentable Java code entities.
+   */
   getCommentableNodesMatcher(
     entityKinds: EntityKind[],
     withComments: boolean,
@@ -82,6 +135,11 @@ class Java implements LanguageOps {
     return { ...declKinds, ...inside, ...docsRule };
   }
 
+  /**
+   * Retrieves all consecutive preceding comment nodes (block or line comments) for the given node.
+   * @param node The AST node to search for preceding comments.
+   * @returns An array of comment nodes if found; otherwise, null.
+   */
   getCommentNodes(node: SgNode) {
     const commentNodes = [];
     let current = node.prev();
@@ -95,14 +153,30 @@ class Java implements LanguageOps {
     return commentNodes.length > 0 ? commentNodes : null;
   }
 
+  /**
+   * Returns the node at which a documentation comment should be inserted.
+   *
+   * @param node The AST node for which to determine the comment insertion position.
+   * @returns The node to use as the insertion point for a documentation comment.
+   */
   getCommentInsertionNode(node: SgNode) {
     return node;
   }
 
+  /**
+   * Returns the system prompt name for the Java language.
+   * @returns An empty string indicating no specific system prompt name.
+   */
   getLanguageSystemPromptName() {
     return "";
   }
 
+  /**
+   * Formats the provided documentation string as a Java Javadoc comment.
+   *
+   * @param docs Documentation content to format.
+   * @returns The input string as a properly formatted Javadoc comment block.
+   */
   getCommentText(docs: string) {
     docs = parsers.unfence(docs, "*");
 
@@ -112,6 +186,15 @@ class Java implements LanguageOps {
     return docs;
   }
 
+  /**
+   * Generates a Java documentation comment prompt for a given declaration.
+   *
+   * @param _ - Chat generation context used for constructing the prompt.
+   * @param declKind - The kind of the declaration (e.g., class, method).
+   * @param declRef - Reference to the declaration to document.
+   * @param fileRef - Reference to the file containing the declaration.
+   * @returns A template string containing instructions for generating a Javadoc comment.
+   */
   addGenerateDocPrompt(
     _: ChatGenerationContext,
     declKind: any,
@@ -127,6 +210,14 @@ class Java implements LanguageOps {
 The full source of the file is in ${fileRef} for reference.`;
   }
 
+  /**
+   * Generates a prompt for updating an existing Java Javadoc comment to reflect the current implementation of a given declaration.
+   *
+   * @param _ Chat generation context used for template string interpolation.
+   * @param declKind The kind of the declaration (e.g., method, class).
+   * @param declRef The identifier or reference string for the declaration.
+   * @returns A string containing instructions for updating the Javadoc comment, including formatting guidelines and contextual information.
+   */
   addUpdateDocPrompt(_: ChatGenerationContext, declKind: any, declRef: string) {
     return _.$`Update the Java Javadoc comment <DOCSTRING> to match the code in ${declKind} ${declRef}.
 - If the docstring is up to date, return /NO/. It's ok to leave it as is.

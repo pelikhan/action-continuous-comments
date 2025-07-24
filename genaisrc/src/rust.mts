@@ -13,9 +13,7 @@ class Rust implements LanguageOps {
     const declKindsRaw: SgRule = {
       any: [
         // Functions
-        entityKinds.includes("function")
-          ? { kind: "function_item" }
-          : null,
+        entityKinds.includes("function") ? { kind: "function_item" } : null,
         // Types (structs, enums, type aliases, traits)
         entityKinds.includes("type") ? { kind: "struct_item" } : null,
         entityKinds.includes("type") ? { kind: "enum_item" } : null,
@@ -75,7 +73,11 @@ class Rust implements LanguageOps {
     const commentNodes = [];
     let current = node.prev();
     // Collect all preceding doc comment nodes (///)
-    while (current && current.kind() === "line_comment" && current.text().startsWith("///")) {
+    while (
+      current &&
+      current.kind() === "line_comment" &&
+      current.text().startsWith("///")
+    ) {
       commentNodes.unshift(current); // Add to beginning to maintain order
       current = current.prev();
     }
@@ -104,9 +106,7 @@ class Rust implements LanguageOps {
       .map((line) => line.trim())
       .filter((line) => line);
 
-    return lines
-      .map((line) => `/// ${line}`)
-      .join("\n");
+    return lines.map((line) => `/// ${line}`).join("\n");
   }
 
   addGenerateDocPrompt(

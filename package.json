@@ -53,6 +53,7 @@
     "mini-go-write-docs": "DEBUG=script* genaiscript run action test/go-without-docs.go --vars dryRun=true maxEdits=2",
     "mock": "DEBUG=script* genaiscript run action --vars dryRun=true updateExisting=true mock=true",
     "dev": "genaiscript run action",
+    "dev:self": "genaiscript run action --no-run-trace genaisrc/src/**",
     "start": "DEBUG=script* genaiscript run action --github-workspace --no-run-trace --no-output-trace",
     "release": "sh release.sh"
   }

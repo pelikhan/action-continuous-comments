@@ -3,7 +3,50 @@ import type { EntityKind, LanguageOps } from "./langops.mts";
 
 const dbg = host.logger("script:python");
 
+/**
+ * Implements LanguageOps for Python source analysis and docstring generation.
+ *
+ * Provides methods to:
+ * - Identify commentable nodes such as functions and classes.
+ * - Extract or locate docstrings within code declarations.
+ * - Determine where Python docstrings should be inserted.
+ * - Generate system prompts for updating and generating Python docstrings, following PEP 257 guidelines.
+ *
+ * Methods:
+ * @param entityKinds Array of entity kinds to match (e.g., "function", "type").
+ * @param withComments Whether to filter nodes that already have comments or docstrings.
+ * @returns Matcher rules for commentable nodes.
+ *
+ * @param decl Node representing the Python declaration.
+ * @returns Array of found docstring nodes, or null if absent.
+ *
+ * @param node Target node to locate insertion point for a docstring.
+ * @returns Node where docstring can be inserted.
+ *
+ * @returns System prompt name for Python documentation.
+ *
+ * @param docs Raw documentation string.
+ * @returns Formatted Python docstring, wrapped as needed.
+ *
+ * @param _ Chat generation context object.
+ * @param declKind Kind of the code declaration (e.g., function, class).
+ * @param declRef Reference string for the declaration.
+ * @returns Prompt string for updating a Python docstring.
+ *
+ * @param _ Chat generation context object.
+ * @param declKind Kind of the code declaration.
+ * @param declRef Reference string for the declaration.
+ * @param fileRef Reference for the source file.
+ * @returns Prompt string for generating a Python docstring.
+ */
 class Python implements LanguageOps {
+  /**
+   * Constructs a matcher rule for identifying Python AST nodes that are eligible for documentation comments.
+   *
+   * @param entityKinds - Array of entity kinds (e.g., "function", "type") to match.
+   * @param withComments - Whether to match only entities with an associated docstring.
+   * @returns Matcher rule object for AST node selection.
+   */
   getCommentableNodesMatcher(entityKinds: EntityKind[], withComments: boolean) {
     const declKinds: SgRule = {
       any: [
@@ -46,6 +89,12 @@ class Python implements LanguageOps {
 
     return { ...declKinds, ...inside, ...docsRule };
   }
+  /**
+   * Retrieves the docstring node associated with the given declaration node.
+   *
+   * @param decl - The declaration node to search for its related docstring.
+   * @returns An array containing the docstring node if found, or null if no docstring exists.
+   */
   getCommentNodes(decl: SgNode) {
     // Find the comment that follows the declaration
     const docnode = decl
@@ -59,13 +108,29 @@ class Python implements LanguageOps {
     dbg(`found docnode: %s`, docnode.text());
     return [docnode];
   }
+  /**
+   * Returns the insertion node for a comment associated with the given AST node.
+   * @param node The AST node representing the declaration.
+   * @returns The block node where a docstring can be inserted, or undefined if not found.
+   */
   getCommentInsertionNode(node: SgNode) {
     return node.find({ rule: { kind: "block" } });
   }
 
+  /**
+   * Returns the system prompt name used for Python language operations.
+   * @returns The identifier string for the Python system prompt.
+   */
   getLanguageSystemPromptName() {
     return "system.python";
   }
+  /**
+   * Formats the given documentation string as a Python docstring.
+   * Ensures the string is wrapped in triple quotes if not already.
+   *
+   * @param docs - The documentation string to format.
+   * @returns The formatted Python docstring.
+   */
   getCommentText(docs: string) {
     docs = parsers.unfence(docs, '"');
     if (!/^\s*""".*.*"""$/s.test(docs)) {
@@ -76,6 +141,14 @@ class Python implements LanguageOps {
     return docs;
   }
 
+  /**
+   * Generates a prompt to update the Python docstring for the specified declaration.
+   *
+   * @param _ - Chat generation context for template interpolation.
+   * @param declKind - The kind of code entity (e.g., function, class).
+   * @param declRef - Reference or name of the target declaration.
+   * @returns The prompt instructing how to update the docstring based on PEP 257 guidelines.
+   */
   addUpdateDocPrompt(_: ChatGenerationContext, declKind: any, declRef: string) {
     return _.$`Update the Python docstring <DOCSTRING> to match the code in ${declKind} ${declRef}.
 - If the docstring is up to date, return /NO/. It's ok to leave it as is.
@@ -98,6 +171,15 @@ description
 """
 `;
   }
+  /**
+   * Generates a prompt for creating a Python documentation comment for a specified declaration.
+   *
+   * @param _ - Chat generation context utility.
+   * @param declKind - The kind of declaration (e.g., function, class) to document.
+   * @param declRef - The reference identifier of the declaration.
+   * @param fileRef - The source file containing the declaration.
+   * @returns A templated string instructing on Python docstring generation.
+   */
   addGenerateDocPrompt(
     _: ChatGenerationContext,
     declKind: string,

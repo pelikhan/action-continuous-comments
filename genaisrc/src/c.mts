@@ -4,7 +4,58 @@ const dbg = host.logger("script:c");
 
 import type { EntityKind, LanguageOps } from "./langops.mts";
 
+/**
+ * Implements LanguageOps for C language support, providing methods to identify commentable code nodes, extract comments, and generate or update Doxygen-style documentation.
+ *
+ * @method getCommentableNodesMatcher
+ *   Builds a matcher rule to select functions, types, and variable declarations for documentation based on entity kinds, comment presence, and export status.
+ *   @param entityKinds Array of entity kinds to filter code nodes.
+ *   @param withComments Whether to match only nodes with existing comments.
+ *   @param exportsOnly Whether to match only exported entities.
+ *   @returns Matcher rule object for AST queries.
+ *
+ * @method getCommentNodes
+ *   Collects preceding comment nodes for the given AST node.
+ *   @param node The reference node to search from.
+ *   @returns Array of comment nodes found before the node.
+ *
+ * @method getCommentInsertionNode
+ *   Returns the node where a comment should be inserted.
+ *   @param node The code node for documentation.
+ *   @returns The node itself as the insertion point.
+ *
+ * @method getLanguageSystemPromptName
+ *   @returns The internal name of the documentation generation prompt for C.
+ *
+ * @method getCommentText
+ *   Formats the given documentation string as a C Doxygen-style comment.
+ *   @param docs The raw docstring content.
+ *   @returns Formatted docstring for insertion into code.
+ *
+ * @method addGenerateDocPrompt
+ *   Constructs a prompt for generating a Doxygen-style comment for a given code declaration.
+ *   @param _ Chat context object.
+ *   @param declKind The kind of declaration being documented.
+ *   @param declRef Reference to the code element.
+ *   @param fileRef Reference to the source file.
+ *   @returns Prompt string for code generation.
+ *
+ * @method addUpdateDocPrompt
+ *   Constructs a prompt for updating an existing Doxygen-style docstring.
+ *   @param _ Chat context object.
+ *   @param declKind The kind of declaration being updated.
+ *   @param declRef Reference to the code element.
+ *   @returns Prompt string for updating documentation.
+ */
 class C implements LanguageOps {
+  /**
+   * Returns a matcher rule for commentable C nodes based on the specified entity kinds and comment presence.
+   *
+   * @param entityKinds Array of entity kinds to match (e.g., function, type, variable).
+   * @param withComments If true, restricts to nodes preceded by a documentation comment.
+   * @param exportsOnly Ignored for C, included for interface consistency.
+   * @returns Matcher rule for use with AST-grep to find nodes eligible for documentation.
+   */
   getCommentableNodesMatcher(
     entityKinds: EntityKind[],
     withComments: boolean,
@@ -57,6 +108,12 @@ class C implements LanguageOps {
     return { ...declKinds, ...inside, ...docsRule };
   }
 
+  /**
+   * Retrieves all contiguous preceding comment nodes before the given node.
+   *
+   * @param node The AST node whose preceding comments are collected.
+   * @returns An array of preceding comment nodes in source order.
+   */
   getCommentNodes(node: SgNode) {
     const commentNodes = [];
     let current = node.prev();
@@ -68,14 +125,30 @@ class C implements LanguageOps {
     return commentNodes;
   }
 
+  /**
+   * Returns the node where a documentation comment should be inserted.
+   *
+   * @param node The AST node to annotate with a comment.
+   * @returns The node appropriate for comment insertion.
+   */
   getCommentInsertionNode(node: SgNode) {
     return node;
   }
 
+  /**
+   * Returns the identifier for the C language system prompt.
+   * @returns The system prompt name for C language.
+   */
   getLanguageSystemPromptName() {
     return "system.c";
   }
 
+  /**
+   * Formats documentation text into a Doxygen-style C comment block.
+   *
+   * @param docs Documentation string to convert into a properly formatted C comment.
+   * @returns A string containing a Doxygen-style C comment, using @brief for summaries and appropriate tags for parameters and return values.
+   */
   getCommentText(docs: string) {
     docs = parsers.unfence(docs, "*");
 
@@ -121,6 +194,15 @@ class C implements LanguageOps {
     }
   }
 
+  /**
+   * Generates a prompt to create a C documentation comment for a declaration.
+   *
+   * @param _ - Chat generation context used for template creation.
+   * @param declKind - The kind of the declaration (e.g., function, type).
+   * @param declRef - The reference identifier of the declaration.
+   * @param fileRef - The file path containing the declaration source.
+   * @returns A formatted prompt for generating a Doxygen-style C docstring.
+   */
   addGenerateDocPrompt(
     _: ChatGenerationContext,
     declKind: any,
@@ -136,6 +218,14 @@ class C implements LanguageOps {
 The full source of the file is in ${fileRef} for reference.`;
   }
 
+  /**
+   * Generates a prompt for updating a C documentation comment to match the implementation.
+   *
+   * @param _ The chat generation context.
+   * @param declKind The kind of code entity being documented.
+   * @param declRef Reference to the declaration whose documentation needs updating.
+   * @returns A prompt instructing how to update the documentation comment.
+   */
   addUpdateDocPrompt(_: ChatGenerationContext, declKind: any, declRef: string) {
     return _.$`Update the C documentation comment <DOCSTRING> to match the code in ${declKind} ${declRef}.
 - If the docstring is up to date, return /NO/. It's ok to leave it as is.
