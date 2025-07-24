@@ -16,6 +16,12 @@ The action uses [GenAIScript](https://microsoft.github.io/genaiscript/) and [AST
 - C#: `.cs`
 - Java: `.java`
 - C: `.h`, `.c`
+- C++: `.hpp`, `.cpp`, `.cc`, `.cxx`
+- Go: `.go`
+- Rust: `.rs`
+
+> [!NOTE]
+> Do you need another language? File an issue or ask copilot to add it.
 
 ## Inputs
 
