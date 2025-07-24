@@ -1,15 +1,13 @@
 # Continuous Documentation GitHub Action
 
-This action regularly scans your codebase for functions that are missing documentation or have existing documentation.
+This repository is a GitHub Action and a tool that can scans your codebase and add/update documentation to your code.
 
 This action is designed to be run regularly over your codebase, using a workflow triggered by each sync with the main branch.
 
 The action uses [GenAIScript](https://microsoft.github.io/genaiscript/) and [AST-GREP](https://ast-grep.github.io/).
 
 > [!NOTE]
-> This action uses GitHub Models for LLM inference. It really assumes you are using [GitHub Models at scale](https://docs.github.com/en/github-models/github-models-at-scale/use-models-at-scale).
-
-You must set "Allow GitHub Actions to create and approve pull requests" in your repository settings to allow the action to create pull requests with documentation updates.
+> This action uses [GitHub Models](https://github.com/models) for LLM inference.
 
 ## Supported languages:
 
@@ -17,6 +15,7 @@ You must set "Allow GitHub Actions to create and approve pull requests" in your 
 - Python: `.py`
 - C#: `.cs`
 - Java: `.java`
+- C: `.h`, `.c`
 
 ## Inputs
 
@@ -42,7 +41,7 @@ Add the following to your step in your workflow file:
 uses: pelikhan/action-continuous-comments@v0
 with:
   github_token: ${{ secrets.GITHUB_TOKEN }}
-  files: "**/src/**/*.{ts,tsx,mts,cts,py,java}"
+  files: "**/src/*"
 ```
 
 ## Example
@@ -94,6 +93,9 @@ jobs:
           branch: genai-commentor/updates
           commit-message: "Code Commentor: Suggested comment improvements"
 ```
+
+> [!NOTE]
+> You must set "Allow GitHub Actions to create and approve pull requests" in your repository settings to allow the action to create pull requests with documentation updates.
 
 ## Development
 
