@@ -62,7 +62,6 @@ You should pretify your code before and after running this script to normalize t
     maxEdits: {
       type: "integer",
       description: "Maximum number of new or updated comments total.",
-      default: 50,
     },
     kinds: {
       type: "string",
