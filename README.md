@@ -77,13 +77,15 @@ npx genaiscript run action "src/index.ts" --vars dryRun=true mock=true
 npx genaiscript run action "src/**/*.ts" --vars dryRun=false maxEdits=50
 ```
 
-**Option B: Direct remote execution (when available):**
+**Option B: Direct remote execution:**
 ```bash
-# Install GenAIScript globally
+# Install GenAIScript globally (one-time setup)
 npm install -g genaiscript
 
-# Run directly from GitHub (replace with your files)
-genaiscript run "github:pelikhan/action-continuous-comments" "src/**/*.{ts,py,cs}" \
+# Run directly from GitHub repository
+genaiscript run action "src/**/*.{ts,py,cs}" \
+  --remote "https://github.com/pelikhan/action-continuous-comments" \
+  --remote-install \
   --vars dryRun=true maxEdits=10
 ```
 
@@ -157,17 +159,32 @@ For other providers, see the [GenAIScript authentication docs](https://microsoft
 
 #### Troubleshooting CLI Usage
 
+#### Troubleshooting CLI Usage
+
 **Script not found error:**
-If you get "script github:pelikhan/action-continuous-comments not found", try:
-1. Ensure you have the latest version of GenAIScript: `npm install -g genaiscript@latest`
-2. Use the specific script name: `genaiscript run "github:pelikhan/action-continuous-comments/action"`
-3. For development/testing, clone the repository and run locally:
+If you get "script not found" errors, try:
+1. For **remote execution**: Use the `--remote` and `--remote-install` flags:
+   ```bash
+   genaiscript run action "src/**/*.ts" \
+     --remote "https://github.com/pelikhan/action-continuous-comments" \
+     --remote-install --vars dryRun=true
+   ```
+
+2. For **local execution** (recommended): Clone the repository first:
    ```bash
    git clone https://github.com/pelikhan/action-continuous-comments.git
    cd action-continuous-comments
    npm install
    npx genaiscript run action "path/to/your/files/**/*.ts" --vars dryRun=true
    ```
+
+**"Cannot find package" errors:**
+- Ensure you use `--remote-install` flag for remote execution to install dependencies
+- For local usage, run `npm install` in the cloned repository
+
+**Warning messages about "duplicate scripts":**
+- These are harmless warnings when using remote execution and can be ignored
+- The tool will still work correctly despite these messages
 
 **No changes made:**
 - Check if your files match the supported extensions: `.ts`, `.tsx`, `.mts`, `.cts`, `.py`, `.cs`
