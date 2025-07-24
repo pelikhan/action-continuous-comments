@@ -5,10 +5,13 @@ import {
 } from "@genaiscript/plugin-ast-grep";
 import { classify } from "./src/classify.mts";
 import { cOps } from "./src/c.mts";
+import { cppOps } from "./src/cpp.mts";
 import { csharpOps } from "./src/csharp.mts";
+import { goOps } from "./src/go.mts";
 import { javaOps } from "./src/java.mts";
 import type { EntityKind, LanguageOps } from "./src/langops.mts";
 import { pythonOps } from "./src/python.mts";
+import { rustOps } from "./src/rust.mts";
 import { typescriptOps } from "./src/typescript.mts";
 
 script({
@@ -20,8 +23,8 @@ the documentation.
 You should pretify your code before and after running this script to normalize the formatting.
 `,
   cache: true,
-  accept: ".ts,.mts,.tsx,.mtsx,.cts,.py,.cs,.java,.h,.c",
-  files: "**/*.{ts,mts,tsx,mtsx,cts,py,cs,java,h,c}",
+  accept: ".ts,.mts,.tsx,.mtsx,.cts,.py,.cs,.java,.h,.c,.rs,.cpp,.hpp,.cc,.cxx,.go",
+  files: "**/*.{ts,mts,tsx,mtsx,cts,py,cs,java,h,c,rs,cpp,hpp,cc,cxx,go}",
   branding: {
     color: "yellow",
     icon: "filter",
@@ -166,6 +169,12 @@ function getLanguageOps(language: SgLang): LanguageOps {
     return javaOps;
   } else if (language === "c") {
     return cOps;
+  } else if (language === "cpp") {
+    return cppOps;
+  } else if (language === "rust") {
+    return rustOps;
+  } else if (language === "go") {
+    return goOps;
   } else {
     cancel(`unsupported language: ${language}`);
   }
@@ -526,7 +535,13 @@ function getLanguage(file: WorkspaceFile): SgLang {
         ? "java"
         : file.filename.endsWith(".c") || file.filename.endsWith(".h")
           ? "c"
-          : "typescript";
+          : file.filename.endsWith(".cpp") || file.filename.endsWith(".hpp") || file.filename.endsWith(".cc") || file.filename.endsWith(".cxx")
+            ? "cpp"
+            : file.filename.endsWith(".rs")
+              ? "rust"
+              : file.filename.endsWith(".go")
+                ? "go"
+                : "typescript";
 }
 
 function getDeclNodeAndKind(decl: SgNode) {
