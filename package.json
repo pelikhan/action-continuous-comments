@@ -3,6 +3,7 @@
   "version": "0.0.3",
   "description": "A GitHub Action to generate TypeScript comments.",
   "dependencies": {
+    "@ast-grep/lang-c": "^0.0.2",
     "@ast-grep/lang-csharp": "^0.0.2",
     "@ast-grep/lang-java": "^0.0.3",
     "@ast-grep/lang-python": "^0.0.2",
@@ -33,6 +34,10 @@
     "mini-csharp-write-docs": "DEBUG=script* genaiscript run action test/csharp-without-docs.cs --vars dryRun=true maxEdits=2",
     "mock-csharp-update-docs": "DEBUG=script* genaiscript run action test/csharp-with-docs.cs --vars dryRun=true mock=true updateExisting=true",
     "mini-csharp-update-docs": "DEBUG=script* genaiscript run action test/csharp-with-docs.cs --vars dryRun=true maxEdits=2 updateExisting=true",
+    "mock-c-write-docs": "DEBUG=script* genaiscript run action test/c-without-docs.c --vars dryRun=true mock=true",
+    "mini-c-write-docs": "DEBUG=script* genaiscript run action test/c-without-docs.c --vars dryRun=true maxEdits=2",
+    "mock-c-update-docs": "DEBUG=script* genaiscript run action test/c-with-docs.c --vars dryRun=true mock=true updateExisting=true",
+    "mini-c-update-docs": "DEBUG=script* genaiscript run action test/c-with-docs.c --vars dryRun=true maxEdits=2 updateExisting=true",
     "mock-java-write-docs": "DEBUG=script* genaiscript run action test/java-without-docs.java --vars dryRun=true mock=true",
     "mini-java-write-docs": "DEBUG=script* genaiscript run action test/java-without-docs.java --vars dryRun=true maxEdits=2",
     "mock-java-update-docs": "DEBUG=script* genaiscript run action test/java-with-docs.java --vars dryRun=true mock=true updateExisting=true",
