@@ -35,7 +35,7 @@ export type ClassifyOptions = {
 export async function classify<L extends Record<string, string>>(
   text: StringLike | PromptGenerator,
   labels: L,
-  options?: ClassifyOptions,
+  options?: ClassifyOptions
 ): Promise<{
   label: keyof typeof labels | "other";
   entropy?: number;
@@ -94,7 +94,7 @@ ${explanations ? "It's a classic joke but the ending does not relate to the star
 no
 
 `,
-        { language: "example" },
+        { language: "example" }
       );
       if (typeof text === "function") await text(_);
       else _.def("DATA", text);
@@ -113,7 +113,7 @@ no
         "system.safety_protected_material",
       ],
       ...rest,
-    },
+    }
   );
 
   // find the last label
@@ -128,7 +128,7 @@ no
     ? (Object.fromEntries(
         res.choices
           .filter((c) => !isNaN(c?.logprob))
-          .map((c, i) => [allChoices[i], c]),
+          .map((c, i) => [allChoices[i], c])
       ) as Record<keyof typeof labels | "other", Logprob>)
     : undefined;
   const logprob = logprobs?.[label];

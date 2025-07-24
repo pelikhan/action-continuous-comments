@@ -6,6 +6,7 @@ import {
 import { classify } from "./src/classify.mts";
 import { cOps } from "./src/c.mts";
 import { csharpOps } from "./src/csharp.mts";
+import { javaOps } from "./src/java.mts";
 import type { EntityKind, LanguageOps } from "./src/langops.mts";
 import { pythonOps } from "./src/python.mts";
 import { typescriptOps } from "./src/typescript.mts";
@@ -19,8 +20,8 @@ the documentation.
 You should pretify your code before and after running this script to normalize the formatting.
 `,
   cache: true,
-  accept: ".ts,.mts,.tsx,.mtsx,.cts,.py,.cs,.c,.h",
-  files: "**/*.{ts,mts,tsx,mtsx,cts,py,cs,c,h}",
+  accept: ".ts,.mts,.tsx,.mtsx,.cts,.py,.cs,.java,.h",
+  files: "**/*.{ts,mts,tsx,mtsx,cts,py,cs,java,h}",
   branding: {
     color: "yellow",
     icon: "filter",
@@ -161,6 +162,8 @@ function getLanguageOps(language: SgLang): LanguageOps {
     return typescriptOps;
   } else if (language === "csharp") {
     return csharpOps;
+  } else if (language === "java") {
+    return javaOps;
   } else if (language === "c") {
     return cOps;
   } else {
@@ -437,8 +440,8 @@ async function updateDocs(file: WorkspaceFile, fileStats: FileStats) {
               system: [
                 "system.technical",
                 langOps.getLanguageSystemPromptName(),
-              ],
-            },
+              ].filter(Boolean),
+            }
           );
 
     fileStats.judge += judgeRes.usage?.total || 0;
@@ -450,7 +453,8 @@ async function updateDocs(file: WorkspaceFile, fileStats: FileStats) {
     }
     edits.replace(docNodes[0], newDocs.trimEnd());
 
-    // TODO: this is not accurate for C# and other languages where docNodes.length > 1, as it leaves whitespace hanging around
+    // For additional comment nodes in multi-line comments,
+    // remove them by replacing with empty string and handle line cleanup in post-processing
     for (let i = 1; i < docNodes.length; i++) {
       edits.replace(docNodes[i], "");
     }
@@ -464,6 +468,22 @@ async function updateDocs(file: WorkspaceFile, fileStats: FileStats) {
     dbg("no edits to apply");
     return;
   }
+
+  // Post-process to remove blank lines left by comment removal
+  if (modifiedFiles.length > 0) {
+    const modifiedFile = modifiedFiles[0];
+    const cleanedContent = modifiedFile.content
+      // Remove lines that only contain whitespace
+      .replace(/^[ \t]*\r?\n/gm, "")
+      // But preserve intentional blank lines by allowing max 1 consecutive blank line
+      .replace(/\n\n\n+/g, "\n\n");
+
+    modifiedFiles[0] = {
+      ...modifiedFile,
+      content: cleanedContent,
+    };
+  }
+
   if (applyEdits) {
     await workspace.writeFiles(modifiedFiles);
   } else {
@@ -501,8 +521,10 @@ function getLanguage(file: WorkspaceFile): SgLang {
   return file.filename.endsWith(".py")
     ? "python"
     : file.filename.endsWith(".cs") || file.filename.endsWith(".csx")
-      ? "csharp"
-      : file.filename.endsWith(".c") || file.filename.endsWith(".h")
+        ? "csharp"
+      : file.filename.endsWith(".java")
+        ? "java"
+          : file.filename.endsWith(".c") || file.filename.endsWith(".h")
         ? "c"
         : "typescript";
 }
