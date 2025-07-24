@@ -1,4 +1,8 @@
-import { astGrep, type SgLang, type SgNode } from "@genaiscript/plugin-ast-grep";
+import {
+  astGrep,
+  type SgLang,
+  type SgNode,
+} from "@genaiscript/plugin-ast-grep";
 import { classify } from "./src/classify.mts";
 import { csharpOps } from "./src/csharp.mts";
 import type { EntityKind, LanguageOps } from "./src/langops.mts";
@@ -207,7 +211,7 @@ if (stats.length) {
   // filter out rows with no edits or generation
   const table = stats
     .filter((row) =>
-      Object.values(row).some((d) => typeof d === "number" && d > 0)
+      Object.values(row).some((d) => typeof d === "number" && d > 0),
     )
     // Format the numbers
     .map((row) => ({
@@ -231,7 +235,7 @@ async function addMissingDocs(file: WorkspaceFile, fileStats: FileStats) {
   const rule = langOps.getCommentableNodesMatcher(
     entityKinds,
     false,
-    exportsOnly
+    exportsOnly,
   );
   dbg(`searching for missing docs in %s`, file.filename);
   const { matches } = await sg.search(language, file.filename, { rule }, {});
@@ -265,7 +269,7 @@ async function addMissingDocs(file: WorkspaceFile, fileStats: FileStats) {
             flexTokens: maxContext,
             label: declText.slice(0, 20) + "...",
             cache,
-          }
+          },
         );
     fileStats.gen += res.usage?.total || 0;
     fileStats.genCost += res.usage?.cost || 0;
@@ -305,7 +309,7 @@ async function addMissingDocs(file: WorkspaceFile, fileStats: FileStats) {
                 "system.technical",
                 langOps.getLanguageSystemPromptName(),
               ],
-            }
+            },
           );
     fileStats.judge += judgeRes.usage?.total || 0;
     fileStats.judgeCost += judgeRes.usage?.cost || 0;
@@ -349,7 +353,7 @@ async function updateDocs(file: WorkspaceFile, fileStats: FileStats) {
   const rule = langOps.getCommentableNodesMatcher(
     entityKinds,
     true,
-    exportsOnly
+    exportsOnly,
   );
   const { matches } = await sg.search(language, file.filename, { rule }, {});
   dbg(`found ${matches.length} docs to updateExisting`);
@@ -384,7 +388,7 @@ async function updateDocs(file: WorkspaceFile, fileStats: FileStats) {
             temperature: 0.2,
             systemSafety: false,
             system: ["system.technical", langOps.getLanguageSystemPromptName()],
-          }
+          },
         );
     fileStats.gen += res.usage?.total || 0;
     fileStats.genCost += res.usage?.cost || 0;
@@ -402,7 +406,7 @@ async function updateDocs(file: WorkspaceFile, fileStats: FileStats) {
     const newDocs = getIndentedCommentText(
       res.text.trim(),
       docNodes[0],
-      langOps
+      langOps,
     );
 
     // Ask LLM if change is worth it
@@ -431,7 +435,7 @@ async function updateDocs(file: WorkspaceFile, fileStats: FileStats) {
                 "system.technical",
                 langOps.getLanguageSystemPromptName(),
               ],
-            }
+            },
           );
 
     fileStats.judge += judgeRes.usage?.total || 0;
@@ -463,14 +467,14 @@ async function updateDocs(file: WorkspaceFile, fileStats: FileStats) {
     output.diff(file, modifiedFiles[0]);
   }
   dbg(
-    `updated ${file.filename} by updating ${fileStats.generated} existing comments`
+    `updated ${file.filename} by updating ${fileStats.generated} existing comments`,
   );
 }
 
 function getIndentedCommentText(
   docs: string,
   node: SgNode,
-  langOps: LanguageOps
+  langOps: LanguageOps,
 ): string {
   const range = node.range();
   dbg(`node range: %o`, range);
@@ -494,8 +498,8 @@ function getLanguage(file: WorkspaceFile): SgLang {
   return file.filename.endsWith(".py")
     ? "python"
     : file.filename.endsWith(".cs") || file.filename.endsWith(".csx")
-    ? "csharp"
-    : "typescript";
+      ? "csharp"
+      : "typescript";
 }
 
 function getDeclNodeAndKind(decl: SgNode) {

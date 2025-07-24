@@ -1,8 +1,10 @@
-# Continuous Documentation GitHub Action
+# AI-Powered Code Documentation Tool
 
-This action regularly scans your codebase for functions that are missing documentation or have existing documentation.
+This tool automatically scans your codebase for functions that are missing documentation or have existing documentation, and intelligently generates or improves them using AI.
 
-This action is designed to be run regularly over your codebase, using a workflow triggered by each sync with the main branch.
+**Two ways to use it:**
+- 🔄 **GitHub Action**: Continuously improve documentation in your CI/CD pipeline
+- 🚀 **CLI Tool**: Run directly on any codebase without setup (perfect for large existing projects)
 
 The action uses [GenAIScript](https://microsoft.github.io/genaiscript/) and [AST-GREP](https://ast-grep.github.io/).
 
@@ -35,6 +37,8 @@ You must set "Allow GitHub Actions to create and approve pull requests" in your 
 
 ## Usage
 
+### Option 1: GitHub Action (Recommended for CI/CD)
+
 Add the following to your step in your workflow file:
 
 ```yaml
@@ -43,6 +47,136 @@ with:
   github_token: ${{ secrets.GITHUB_TOKEN }}
   files: "**/src/**/*.{ts,tsx,mts,cts,py}"
 ```
+
+### Option 2: Direct CLI Usage (Great for Large Existing Codebases)
+
+You can run the commentor directly on any codebase without setting up a GitHub Action using GenAIScript's remote repository feature:
+
+```bash
+# Install GenAIScript globally (one time setup)
+npm install -g genaiscript
+
+# Run the commentor on your codebase
+genaiscript run "github:pelikhan/action-continuous-comments" "src/**/*.{ts,py,cs}" \
+  --vars dryRun=true maxEdits=10
+```
+
+#### Quick Start Examples
+
+**Option A: Clone and run locally (recommended for development):**
+```bash
+# One-time setup
+git clone https://github.com/pelikhan/action-continuous-comments.git
+cd action-continuous-comments
+npm install
+
+# Test on a few files first (dry run with mock data)
+npx genaiscript run action "src/index.ts" --vars dryRun=true mock=true
+
+# Generate real documentation
+npx genaiscript run action "src/**/*.ts" --vars dryRun=false maxEdits=50
+```
+
+**Option B: Direct remote execution (when available):**
+```bash
+# Install GenAIScript globally
+npm install -g genaiscript
+
+# Run directly from GitHub (replace with your files)
+genaiscript run "github:pelikhan/action-continuous-comments" "src/**/*.{ts,py,cs}" \
+  --vars dryRun=true maxEdits=10
+```
+
+**Language-specific examples:**
+```bash
+# TypeScript/JavaScript projects
+npx genaiscript run action "src/**/*.{ts,tsx,mts}" --vars exportsOnly=true
+
+# Python projects  
+npx genaiscript run action "src/**/*.py" --vars kinds="function,class" maxEdits=30
+
+# C# projects
+npx genaiscript run action "src/**/*.cs" --vars kinds="class,method,property" 
+
+# Mixed codebases
+npx genaiscript run action "src/**/*.{ts,py,cs}" --vars maxEdits=100 updateExisting=false
+```
+```bash
+# 1. Test on a small subset first
+npx genaiscript run action "src/utils/*.ts" --vars dryRun=true mock=true
+
+# 2. Run on a larger set with dry run to preview
+npx genaiscript run action "src/**/*.ts" --vars dryRun=true maxEdits=100
+
+# 3. Apply changes incrementally
+npx genaiscript run action "src/components/**/*.ts" --vars dryRun=false maxEdits=20
+
+# 4. Update existing docs (higher cost, but improves quality)
+npx genaiscript run action "src/api/**/*.ts" --vars updateExisting=true maxEdits=10
+```
+
+#### CLI Parameters
+
+All GitHub Action inputs are available as `--vars` parameters:
+
+- `dryRun=true` - Preview changes without modifying files
+- `mock=true` - Use mock documentation for testing
+- `maxEdits=N` - Limit the number of documentation additions/updates
+- `updateExisting=true` - Update existing documentation (increases cost)
+- `exportsOnly=true` - Only document exported entities
+- `kinds="function,class"` - Specify which entity types to document
+- `model="github:openai/gpt-4o-mini"` - Choose the AI model to use
+- `judge=true` - Enable quality validation of generated docs
+
+#### Benefits of CLI Usage
+
+- **No setup required** - Run immediately on any existing codebase
+- **Test before committing** - Try it out with `dryRun=true` first  
+- **Flexible targeting** - Process specific files or directories
+- **One-time improvements** - Perfect for large legacy codebases
+- **Local development** - Run during development without CI/CD overhead
+- **Cost control** - Use `maxEdits` to limit API usage and costs
+
+#### Performance Tips for Large Codebases
+
+- **Start small**: Use `maxEdits=10` for initial testing
+- **Use dry run**: Always test with `dryRun=true` first to preview changes
+- **Target strategically**: Focus on public APIs with `exportsOnly=true`
+- **Incremental approach**: Process directories one at a time rather than entire codebase
+- **Cache benefits**: GenAIScript caches LLM responses, so re-running is faster
+- **Monitor costs**: Each documentation generation uses AI tokens - start conservative
+
+#### Authentication
+
+For GitHub Models (default), ensure you have:
+```bash
+export GITHUB_TOKEN="your_github_token_with_models_read_permission"
+```
+
+For other providers, see the [GenAIScript authentication docs](https://microsoft.github.io/genaiscript/reference/providers/).
+
+#### Troubleshooting CLI Usage
+
+**Script not found error:**
+If you get "script github:pelikhan/action-continuous-comments not found", try:
+1. Ensure you have the latest version of GenAIScript: `npm install -g genaiscript@latest`
+2. Use the specific script name: `genaiscript run "github:pelikhan/action-continuous-comments/action"`
+3. For development/testing, clone the repository and run locally:
+   ```bash
+   git clone https://github.com/pelikhan/action-continuous-comments.git
+   cd action-continuous-comments
+   npm install
+   npx genaiscript run action "path/to/your/files/**/*.ts" --vars dryRun=true
+   ```
+
+**No changes made:**
+- Check if your files match the supported extensions: `.ts`, `.tsx`, `.mts`, `.cts`, `.py`, `.cs`
+- Verify files contain undocumented functions/classes/interfaces
+- Try with `mock=true` first to see where documentation would be added
+
+**Authentication issues:**
+- Ensure your GitHub token has `models: read` permission
+- For other AI providers, see [GenAIScript provider configuration](https://microsoft.github.io/genaiscript/reference/providers/)
 
 ## Example
 
