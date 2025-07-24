@@ -37,21 +37,12 @@ jobs:
         with:
           path: .genaiscript/cache
           key: genaiscript-${{ runner.os }}-${{ hashFiles('.genaiscript/cache/**') }}
-      - name: Generate TypeScript comments
+      - name: Generate comments
         uses: ./
         with:
           dry_run: true
           debug: true
           max_edits: 2
-          files: test/**/*.ts
-          model: github:openai/gpt-4.1-mini
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Generate Python comments
-        uses: ./
-        with:
-          dry_run: true
-          debug: true
-          max_edits: 2
-          files: test/**/*.py
+          files: test/**/*
           model: github:openai/gpt-4.1-mini
           github_token: ${{ secrets.GITHUB_TOKEN }}
