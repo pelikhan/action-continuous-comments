@@ -8,35 +8,43 @@ class Java implements LanguageOps {
   getCommentableNodesMatcher(
     entityKinds: EntityKind[],
     withComments: boolean,
-    exportsOnly: boolean
+    exportsOnly: boolean,
   ) {
     const declKindsRaw: SgRule = {
       any: [
         entityKinds.includes("type") ? { kind: "class_declaration" } : null,
         entityKinds.includes("type") ? { kind: "interface_declaration" } : null,
         entityKinds.includes("type") ? { kind: "enum_declaration" } : null,
-        entityKinds.includes("type") ? { kind: "annotation_type_declaration" } : null,
-        entityKinds.includes("function") ? { kind: "method_declaration" } : null,
-        entityKinds.includes("function") ? { kind: "constructor_declaration" } : null,
+        entityKinds.includes("type")
+          ? { kind: "annotation_type_declaration" }
+          : null,
+        entityKinds.includes("function")
+          ? { kind: "method_declaration" }
+          : null,
+        entityKinds.includes("function")
+          ? { kind: "constructor_declaration" }
+          : null,
         entityKinds.includes("property") ? { kind: "field_declaration" } : null,
         entityKinds.includes("property") ? { kind: "enum_constant" } : null,
       ].filter(Boolean) as SgRule[],
     };
-    
+
     // Java doesn't have explicit exports like TypeScript, but we can filter by public modifier
-    const declKinds: SgRule = exportsOnly ? {
-      all: [
-        declKindsRaw,
-        {
-          has: {
-            kind: "modifiers",
-            has: {
-              kind: "public"
-            }
-          }
+    const declKinds: SgRule = exportsOnly
+      ? {
+          all: [
+            declKindsRaw,
+            {
+              has: {
+                kind: "modifiers",
+                has: {
+                  kind: "public",
+                },
+              },
+            },
+          ],
         }
-      ]
-    } : declKindsRaw;
+      : declKindsRaw;
 
     const inside: SgRule = {
       inside: {
@@ -56,18 +64,15 @@ class Java implements LanguageOps {
         ],
       },
     };
-    
+
     // In Java, comments might be called differently in the AST
     const withDocComment: SgRule = {
       follows: {
-        any: [
-          { kind: "block_comment" },
-          { kind: "line_comment" }
-        ],
+        any: [{ kind: "block_comment" }, { kind: "line_comment" }],
         stopBy: "neighbor",
       },
     };
-    
+
     const docsRule: SgRule = withComments
       ? withDocComment
       : {
@@ -80,7 +85,10 @@ class Java implements LanguageOps {
   getCommentNodes(node: SgNode) {
     const commentNodes = [];
     let current = node.prev();
-    while (current && (current.kind() === "block_comment" || current.kind() === "line_comment")) {
+    while (
+      current &&
+      (current.kind() === "block_comment" || current.kind() === "line_comment")
+    ) {
       commentNodes.unshift(current);
       current = current.prev();
     }
@@ -108,7 +116,7 @@ class Java implements LanguageOps {
     _: ChatGenerationContext,
     declKind: any,
     declRef: string,
-    fileRef: string
+    fileRef: string,
   ) {
     return _.$`Generate a Java documentation comment for the ${declKind} ${declRef}.
 - Make sure parameters, type parameters, and return types are documented if relevant.
