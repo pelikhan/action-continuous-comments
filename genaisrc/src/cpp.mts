@@ -90,7 +90,7 @@ class Cpp implements LanguageOps {
   }
 
   getLanguageSystemPromptName() {
-    return "system.cpp";
+    return "";
   }
 
   getCommentText(docs: string) {

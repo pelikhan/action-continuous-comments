@@ -83,7 +83,7 @@ class Go implements LanguageOps {
   }
 
   getLanguageSystemPromptName() {
-    return "system.go";
+    return "";
   }
 
   getCommentText(docs: string) {

@@ -87,7 +87,7 @@ class Rust implements LanguageOps {
   }
 
   getLanguageSystemPromptName() {
-    return "system.rust";
+    return "";
   }
 
   getCommentText(docs: string) {
