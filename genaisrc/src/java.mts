@@ -100,7 +100,7 @@ class Java implements LanguageOps {
   }
 
   getLanguageSystemPromptName() {
-    return "system.java";
+    return "";
   }
 
   getCommentText(docs: string) {
