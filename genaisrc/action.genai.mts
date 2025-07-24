@@ -5,6 +5,7 @@ import {
 } from "@genaiscript/plugin-ast-grep";
 import { classify } from "./src/classify.mts";
 import { csharpOps } from "./src/csharp.mts";
+import { javaOps } from "./src/java.mts";
 import type { EntityKind, LanguageOps } from "./src/langops.mts";
 import { pythonOps } from "./src/python.mts";
 import { typescriptOps } from "./src/typescript.mts";
@@ -18,8 +19,8 @@ the documentation.
 You should pretify your code before and after running this script to normalize the formatting.
 `,
   cache: true,
-  accept: ".ts,.mts,.tsx,.mtsx,.cts,.py,.cs",
-  files: "**/*.{ts,mts,tsx,mtsx,cts,py,cs}",
+  accept: ".ts,.mts,.tsx,.mtsx,.cts,.py,.cs,.java",
+  files: "**/*.{ts,mts,tsx,mtsx,cts,py,cs,java}",
   branding: {
     color: "yellow",
     icon: "filter",
@@ -160,6 +161,8 @@ function getLanguageOps(language: SgLang): LanguageOps {
     return typescriptOps;
   } else if (language === "csharp") {
     return csharpOps;
+  } else if (language === "java") {
+    return javaOps;
   } else {
     cancel(`unsupported language: ${language}`);
   }
@@ -516,7 +519,9 @@ function getLanguage(file: WorkspaceFile): SgLang {
     ? "python"
     : file.filename.endsWith(".cs") || file.filename.endsWith(".csx")
       ? "csharp"
-      : "typescript";
+      : file.filename.endsWith(".java")
+        ? "java"
+        : "typescript";
 }
 
 function getDeclNodeAndKind(decl: SgNode) {
