@@ -21,7 +21,7 @@
     "fix": "genaiscript scripts fix",
     "typecheck": "genaiscript scripts compile",
     "configure": "genaiscript configure action",
-    "test": "DEBUG=script* genaiscript run action test/* --vars dryRun=true maxEdits=2 updateExisting=true",
+    "test": "DEBUG=script* genaiscript run action test/* --vars dryRun=true maxEdits=20 updateExisting=true",
     "mock-TypeScript": "DEBUG=script* genaiscript run action ../TypeScript/src/**/*.ts --vars dryRun=true mock=true maxEdits=10000",
     "mini-TypeScript": "DEBUG=script* genaiscript run action ../TypeScript/src/**/*.ts --vars dryRun=true maxEdits=2",
     "midi-TypeScript": "DEBUG=script* genaiscript run action ../TypeScript/src/**/*.ts --vars dryRun=true maxEdits=100",
