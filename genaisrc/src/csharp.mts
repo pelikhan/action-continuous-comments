@@ -89,7 +89,7 @@ class CSharp implements LanguageOps {
   }
 
   getLanguageSystemPromptName() {
-    return "system.csharp";
+    return "";
   }
   getCommentText(docs: string) {
     docs = parsers.unfence(docs, "*");

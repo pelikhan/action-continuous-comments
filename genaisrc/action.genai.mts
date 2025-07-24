@@ -434,7 +434,7 @@ async function updateDocs(file: WorkspaceFile, fileStats: FileStats) {
               system: [
                 "system.technical",
                 langOps.getLanguageSystemPromptName(),
-              ],
+              ].filter(Boolean),
             },
           );
 
