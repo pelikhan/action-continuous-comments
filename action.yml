@@ -57,7 +57,7 @@ inputs:
     default: 6000
   files:
     description: Files to process, separated by semi columns (;).
-      .ts,.mts,.tsx,.mtsx,.cts,.py,.cs,.java,.h
+      .ts,.mts,.tsx,.mtsx,.cts,.py,.cs,.java,.h,.c
     required: false
   debug:
     description: Enable debug logging

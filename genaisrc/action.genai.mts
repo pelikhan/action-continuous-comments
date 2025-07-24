@@ -20,8 +20,8 @@ the documentation.
 You should pretify your code before and after running this script to normalize the formatting.
 `,
   cache: true,
-  accept: ".ts,.mts,.tsx,.mtsx,.cts,.py,.cs,.java,.h",
-  files: "**/*.{ts,mts,tsx,mtsx,cts,py,cs,java,h}",
+  accept: ".ts,.mts,.tsx,.mtsx,.cts,.py,.cs,.java,.h,.c",
+  files: "**/*.{ts,mts,tsx,mtsx,cts,py,cs,java,h,c}",
   branding: {
     color: "yellow",
     icon: "filter",
