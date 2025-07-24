@@ -16,6 +16,7 @@ You must set "Allow GitHub Actions to create and approve pull requests" in your 
 - TypeScript: `.ts`, `.tsx`, `.mts`, `.cts`
 - Python: `.py`
 - C#: `.cs`
+- Java: `.java`
 
 ## Inputs
 
@@ -41,7 +42,7 @@ Add the following to your step in your workflow file:
 uses: pelikhan/action-continuous-comments@v0
 with:
   github_token: ${{ secrets.GITHUB_TOKEN }}
-  files: "**/src/**/*.{ts,tsx,mts,cts,py}"
+  files: "**/src/**/*.{ts,tsx,mts,cts,py,java}"
 ```
 
 ## Example
