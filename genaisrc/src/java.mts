@@ -8,7 +8,7 @@ class Java implements LanguageOps {
   getCommentableNodesMatcher(
     entityKinds: EntityKind[],
     withComments: boolean,
-    exportsOnly: boolean,
+    exportsOnly: boolean
   ) {
     const declKindsRaw: SgRule = {
       any: [
@@ -116,7 +116,7 @@ class Java implements LanguageOps {
     _: ChatGenerationContext,
     declKind: any,
     declRef: string,
-    fileRef: string,
+    fileRef: string
   ) {
     return _.$`Generate a Java documentation comment for the ${declKind} ${declRef}.
 - Make sure parameters, type parameters, and return types are documented if relevant.
