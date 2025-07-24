@@ -443,7 +443,8 @@ async function updateDocs(file: WorkspaceFile, fileStats: FileStats) {
     }
     edits.replace(docNodes[0], newDocs.trimEnd());
 
-    // TODO: this is not accurate for C# and other languages where docNodes.length > 1, as it leaves whitespace hanging around
+    // For additional comment nodes in multi-line comments, 
+    // remove them by replacing with empty string and handle line cleanup in post-processing
     for (let i = 1; i < docNodes.length; i++) {
       edits.replace(docNodes[i], "");
     }
@@ -457,6 +458,22 @@ async function updateDocs(file: WorkspaceFile, fileStats: FileStats) {
     dbg("no edits to apply");
     return;
   }
+  
+  // Post-process to remove blank lines left by comment removal
+  if (modifiedFiles.length > 0) {
+    const modifiedFile = modifiedFiles[0];
+    const cleanedContent = modifiedFile.content
+      // Remove lines that only contain whitespace
+      .replace(/^[ \t]*\r?\n/gm, '')
+      // But preserve intentional blank lines by allowing max 1 consecutive blank line
+      .replace(/\n\n\n+/g, '\n\n');
+    
+    modifiedFiles[0] = {
+      ...modifiedFile,
+      content: cleanedContent
+    };
+  }
+  
   if (applyEdits) {
     await workspace.writeFiles(modifiedFiles);
   } else {
