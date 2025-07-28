@@ -11,6 +11,7 @@ import { goOps } from "./src/go.mts";
 import { javaOps } from "./src/java.mts";
 import type { EntityKind, LanguageOps } from "./src/langops.mts";
 import { pythonOps } from "./src/python.mts";
+import { rubyOps } from "./src/ruby.mts";
 import { rustOps } from "./src/rust.mts";
 import { typescriptOps } from "./src/typescript.mts";
 
@@ -24,8 +25,8 @@ You should pretify your code before and after running this script to normalize t
 `,
   cache: true,
   accept:
-    ".ts,.mts,.tsx,.mtsx,.cts,.py,.cs,.java,.h,.c,.rs,.cpp,.hpp,.cc,.cxx,.go",
-  files: "**/*.{ts,mts,tsx,mtsx,cts,py,cs,java,h,c,rs,cpp,hpp,cc,cxx,go}",
+    ".ts,.mts,.tsx,.mtsx,.cts,.py,.cs,.java,.h,.c,.rs,.cpp,.hpp,.cc,.cxx,.go,.rb",
+  files: "**/*.{ts,mts,tsx,mtsx,cts,py,cs,java,h,c,rs,cpp,hpp,cc,cxx,go,rb}",
   branding: {
     color: "yellow",
     icon: "filter",
@@ -176,6 +177,8 @@ function getLanguageOps(language: SgLang): LanguageOps {
     return rustOps;
   } else if (language === "go") {
     return goOps;
+  } else if (language === "ruby") {
+    return rubyOps;
   } else {
     cancel(`unsupported language: ${language}`);
   }
@@ -545,7 +548,9 @@ function getLanguage(file: WorkspaceFile): SgLang {
               ? "rust"
               : file.filename.endsWith(".go")
                 ? "go"
-                : "typescript";
+                : file.filename.endsWith(".rb")
+                  ? "ruby"
+                  : "typescript";
 }
 
 function getDeclNodeAndKind(decl: SgNode) {
