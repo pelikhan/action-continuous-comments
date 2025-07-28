@@ -57,9 +57,19 @@ class Ruby implements LanguageOps {
     const declKinds: SgRule = {
       any: [
         entityKinds.includes("function") ? { kind: "method" } : null,
+        entityKinds.includes("function") ? { kind: "singleton_method" } : null,
         entityKinds.includes("type") ? { kind: "class" } : null,
         entityKinds.includes("module") ? { kind: "module" } : null,
       ].filter(Boolean) as SgRule[],
+    };
+
+    const inside: SgRule = {
+      inside: {
+        any: [
+          { kind: "program" }, // Top-level Ruby program
+          { kind: "body_statement" }, // Inside class/module bodies
+        ],
+      },
     };
 
     // Ruby comments precede declarations, so we look for comment nodes before the declaration
@@ -76,7 +86,7 @@ class Ruby implements LanguageOps {
           not: withDocComment,
         };
 
-    return { ...declKinds, ...docsRule };
+    return { ...declKinds, ...inside, ...docsRule };
   }
 
   /**
@@ -141,9 +151,9 @@ class Ruby implements LanguageOps {
 
     // Format as Ruby comments
     const lines = docs
-      .split(/\\r?\\n/g)
+      .split(/\r?\n/g)
       .map((line) => line.trim())
-      .filter((line) => line || docs.includes("\\n")); // Keep empty lines if original had line breaks
+      .filter((line) => line || docs.includes("\n")); // Keep empty lines if original had line breaks
 
     if (lines.length === 0) {
       return "# TODO: Add documentation";
@@ -155,7 +165,7 @@ class Ruby implements LanguageOps {
         if (line.startsWith("#")) return line;
         return `# ${line}`;
       })
-      .join("\\n");
+      .join("\n");
 
     return formatted;
   }
