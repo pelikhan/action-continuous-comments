@@ -5,6 +5,12 @@
 #   puts result # => 5
 class Calculator
   # Initialize the calculator
+  # Initialize a new Calculator instance
+  # Sets up an empty array to store calculation history
+  # @return [void] 
+  def initialize
+    @history = []
+  end
   def initialize
     @history = []
   end
@@ -42,6 +48,10 @@ module MathUtils
   # @param x [Numeric] first number
   # @param y [Numeric] second number
   # @return [Numeric] product of x and y
+  # Multiply two numbers
+  # @param x [Numeric] the first operand
+  # @param y [Numeric] the second operand
+  # @return [Numeric] the product of x and y
   def self.multiply(x, y)
     x * y
   end
